@@ -8,6 +8,14 @@
 <body> 
 	<h2>Hello ldap!</h2> 
 	<div>ldap 페이지 입니다</div> 
-	asss
+	<form action="/login" method="post">
+	<div>
+		<input type="text" name="cn" id="cn" placeholder="이름을 입력헤주세요"><br>
+		<input type="text" name="pw" id="pw" placeholder="비밀번호를 입력헤주세요">
+		<button type="submit">Login</button>
+	</div>
+	</form>
+	<div>
+	</div>
 </body> 
 </html>
