@@ -18,20 +18,16 @@ public class LdapController {
 	}
 
 		@RequestMapping(value="/login")
-		public String searchProc(User vo) throws Exception{
+		public String searchProc(User vo) throws NamingException{
 	
 			System.out.println("-----login to authuser-----");    
 			System.out.println("login user : " + vo.toString());
 		
 		    LDAPConnection con = new LDAPConnection();
 		    
-		    System.out.println("aa");
+		    System.out.println("login user 하위에 존재하는 계정 정보 서칭");
 		    con.connection();
-		    
-	//	    con.authUser(vo);
-		    con.getAllUsers();
-		    System.out.println("bb");
-	//	    con.searchUsers(vo);
+		    con.searchUsers(vo);
 		    
 			System.out.println("-----end-----");    
 

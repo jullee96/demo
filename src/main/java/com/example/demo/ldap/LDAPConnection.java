@@ -135,7 +135,7 @@ public class LDAPConnection {
 		controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 		controls.setReturningAttributes(reqAtt);
 
-		NamingEnumeration users = dc.search("dc=example,dc=com", searchFilter, controls);
+		NamingEnumeration users = dc.search("cn=admin,dc=example,dc=com", searchFilter, controls);
 
 		SearchResult result = null;
 		while (users.hasMore()) {
