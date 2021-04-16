@@ -19,27 +19,12 @@ import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
+
 public class LDAPConnection {
 
     private DirContext dc = null; 
-//        public static void main() throws NamingException {
-//            LDAPConnection con = new LDAPConnection();
-//            con.connection();
-//            System.out.println("start");
-//    //        con.searchUsers();
-//            
-//            System.out.println("----------");
-//            con.searchGroups();
-//            
-//            System.out.println("----------");
-//      //      con.getAllUsers();
-//            
-//            System.out.println("----------");
-//      //      con.addUser();
-//            
-//            System.out.println("end");
-//        }
-
+    /* connection */
+    
     public void connection(){
         Properties env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -49,64 +34,100 @@ public class LDAPConnection {
         env.put(Context.SECURITY_CREDENTIALS, "admin");
         try {
                 dc = new InitialDirContext(env);
-                System.out.println("success");
+                System.out.println("connection success to ldap server...");
         } catch (AuthenticationException ex) {
-			System.out.println(ex.getMessage());
+			System.out.println("connection fail to ldap server..."+ex.getMessage());
 		} catch (NamingException e) {
             e.printStackTrace();
         }
     }
-
-//    public void searchUsers() throws NamingException {
-//        String searchFilter = "(&(objectClass=inetOrgPerson))";
-//		String[] reqAtt = { "cn", "sn","uid" };
-//		SearchControls controls = new SearchControls();
-//		controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-//		controls.setReturningAttributes(reqAtt);
-//
-//		NamingEnumeration users = dc.search("cn=ivs,dc=example,dc=com", searchFilter, controls);
-//
-//		SearchResult result = null;
-//		while (users.hasMore()) {
-//			result = (SearchResult) users.next();
-//			Attributes attr = result.getAttributes();
-//			String name = attr.get("cn").get(0).toString();
-//			System.out.println(attr.get("cn"));
-//			System.out.println(attr.get("sn"));
-//			System.out.println(attr.get("uid"));
-//			System.out.println("");
-//            
-//		}
-//
-//	}
-
     
-    public void searchUsers(User vo) throws NamingException {
-        String searchFilter = "(&(objectClass=inetOrgPerson))";
-		String[] reqAtt = { "cn", "sn","uid" };
-		SearchControls controls = new SearchControls();
-		controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-		controls.setReturningAttributes(reqAtt);
+    /* use this to authenticate any existing user */
+	public static boolean authUser(User vo)
+	{
+		try {
+			Properties env = new Properties();
+			env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+			env.put(Context.PROVIDER_URL, "ldap://192.168.0.207:389");
+			env.put(Context.SECURITY_PRINCIPAL, "cn="+vo.getCn()+",dc=example,dc=com");  //check the DN correctly
+			env.put(Context.SECURITY_CREDENTIALS, vo.getPw());
+			DirContext con = new InitialDirContext(env);
+			
+			System.out.println("authUser success"+": cn="+vo.getCn()+",dc=example,dc=com");
+			//con.close();
+			
+			return true;
+		}catch (Exception e) {
+			System.out.println("failed:: "+e.getMessage());
+			return false;
+		}
+	}
+	
 
-		NamingEnumeration users = dc.search("cn="+vo.getCn()+",dc=example,dc=com", searchFilter, controls);
+    ////* search method *////
+
+	public void searchAll() throws NamingException {
+		String searchFilter = "(objectClass=*)";
+		SearchControls searchScope = new SearchControls();
+		searchScope.setSearchScope(SearchControls.SUBTREE_SCOPE);
+
+		NamingEnumeration baseDn = dc.search("dc=example,dc=com", searchFilter, searchScope);
 
 		SearchResult result = null;
-		while (users.hasMore()) {
-			result = (SearchResult) users.next();
+
+		while (baseDn.hasMore()) {
+			result = (SearchResult) baseDn.next();
 			Attributes attr = result.getAttributes();
-			String name = attr.get("cn").get(0).toString();
-			System.out.println(attr.get("cn"));
-			System.out.println(attr.get("sn"));
-			System.out.println(attr.get("uid"));
+
+			System.out.println("attr : " +attr);
+
+//			System.out.println(attr.get("cn"));
+//			System.out.println(attr.get("sn"));
+//			System.out.println(attr.get("dn"));
+
 			System.out.println("");
-            
+
 		}
 
 	}
 
     
+    public String searchUsers(User vo) throws NamingException {
+    	String searchFilter = "(&(objectClass=*)(cn="+vo.getCn()+"))";
+    	String[] reqAtt = { "cn", "sn","uid", "mail", "givenName" ,"objectClass" };
+		SearchControls controls = new SearchControls();
+		String resultStr = "";
+		
+		controls.setReturningAttributes(reqAtt);
+
+    	NamingEnumeration baseDn = dc.search("ou="+vo.getOu()+",dc=example,dc=com",searchFilter, controls);
+		String chkOu = "";
+
+    	SearchResult result = null;
+    			
+		while (baseDn.hasMore()) {
+			result = (SearchResult)baseDn.next();
+			Attributes attr = result.getAttributes();
+			chkOu = attr.toString();
+			System.out.println(attr.get("cn"));
+			System.out.println(attr.get("sn"));
+			System.out.println(attr.get("uid"));
+				
+		}
+
+		String[] tmpOuSplit = chkOu.split("=");
+		for (int i = 0; i < tmpOuSplit.length; i++) {
+			System.out.println("tmpOuSplit :" + tmpOuSplit[i]);
+		}
+
+		resultStr = tmpOuSplit[0].toString();
+		return resultStr;
+
+	}
+
+    
     public void searchGroups() throws NamingException {
-        String searchFilter = "(&(objectClass=inetOrgPerson))";
+       String searchFilter = "(&(objectClass=inetOrgPerson))";
 		String[] reqAtt = { "cn", "sn","uid" };
 		SearchControls controls = new SearchControls();
 		controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -116,7 +137,10 @@ public class LDAPConnection {
 
 		SearchResult result = null;
 		while (users.hasMore()) {
+			
 			result = (SearchResult) users.next();
+			
+			
 			Attributes attr = result.getAttributes();
 			String name = attr.get("cn").get(0).toString();
 			System.out.println(attr.get("cn"));
@@ -140,8 +164,12 @@ public class LDAPConnection {
 		SearchResult result = null;
 		while (users.hasMore()) {
 			result = (SearchResult) users.next();
+			System.out.println("result---" +result.toString());
 			Attributes attr = result.getAttributes();
+			System.out.println("get users....");
+
 			String name = attr.get("cn").get(0).toString();
+
 			System.out.println(attr.get("cn"));
 			System.out.println(attr.get("sn"));
 			System.out.println("");
@@ -149,6 +177,8 @@ public class LDAPConnection {
 		}
 
 	}
+    
+    ////* add user method *////
 
 	public void addUser(User vo) {
 		Attributes attributes = new BasicAttributes();
@@ -167,6 +197,7 @@ public class LDAPConnection {
 		}
 
 	}
+	
 
 	public void addUserToGroup(String username, String groupName)
 	{
@@ -205,27 +236,7 @@ public class LDAPConnection {
 		
 	}
 
-    /* use this to authenticate any existing user */
-//	public static boolean authUser(String username, String password)
-	public static boolean authUser(User vo)
-	{
-		try {
-			Properties env = new Properties();
-			env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-			env.put(Context.PROVIDER_URL, "ldap://192.168.0.207:389");
-			env.put(Context.SECURITY_PRINCIPAL, "cn="+vo.getCn()+",dc=example,dc=com");  //check the DN correctly
-			env.put(Context.SECURITY_CREDENTIALS, vo.getPw());
-			DirContext con = new InitialDirContext(env);
-			System.out.println("authUser success");
-			//con.close();
-			
-			return true;
-		}catch (Exception e) {
-			System.out.println("failed:: "+e.getMessage());
-			return false;
-		}
-	}
-	
+    
 	/* use this to update user password */
 	public void updateUserPassword(String username, String password) {
 		try {
