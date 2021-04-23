@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+ 
+<mapper namespace="com.example.demo.ldap.mapper.UserMapper">
+
+<!-- 저장된 유저 불러오기 -->
+<select id="getAllUserList" parameterType="com.example.demo.ldap.User" resultType="com.example.demo.ldap.User">
+SELECT * 
+FROM tb_users 
+</select>
+
+<select id="getInOuUserList" parameterType="com.example.demo.ldap.User" resultType="com.example.demo.ldap.User">
+SELECT * 
+FROM tb_users
+WHERE user_name = #{cn} 
+</select>
+
+
+<!-- 유저 정보 저장하기 -->
+<insert id="saveUser" parameterType="com.example.demo.ldap.User">
+INSERT 
+	INTO 
+		tb_users 
+		(
+			user_name,
+			user_com,
+		) 
+	VALUES
+		(
+			#{cn},
+			#{ou}
+		)
+</insert>
+
+<delete id="deleteUser" parameterType="com.example.demo.ldap.User">
+
+</delete>
+
+
+</mapper>

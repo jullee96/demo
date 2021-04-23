@@ -21,11 +21,11 @@
 		<div>
 			<p>회사의 유저 찾기</p>
 			<input type="text" name="ou" id="ou" value="testGroup" placeholder="회사를 입력헤주세요"><br>
-			<input type="text" name="cn" id="cn" value="aaa a" placeholder="이름을 입력헤주세요">
+			<input type="text" name="cn1" id="cn" placeholder="이름을 입력헤주세요">
 			<button type="button" id="btnSearchOrgPerson">Search</button>
 		
 			<p>회사의 사람들 찾기 - 하위 엔트리 출력</p>
-			<input type="text" name="ou2" id="ou" value="" placeholder="회사를 입력헤주세요"><br>
+			<input type="text" name="ou2" id="ou" value="testGroup" placeholder="회사를 입력헤주세요"><br>
 			<button type="button" id="btnSearchOrgPeople">Search</button>
 		
 			<br><br>
@@ -37,22 +37,24 @@
 			<br><br>
 			<p>회사 추가</p>
 			<input type="text" name="cn2" id="cn" placeholder="이름을 입력헤주세요"><br>
-			<button type="button" id="fnSaveOrg" >add</button>
+			<button type="button" id="btnSaveOrg" >add</button>
 
 			<br><br>
 			<p>유저 추가</p>
 			<select name="">
 					<option value="">--회사를 선택하세요--</option>
-					<option value="">ivs</option>
-					<option value="">testGroup</option>
+					<option value="ivs">ivs</option>
+					<option value="testGroup">testGroup</option>
 
 <%-- 					<c:forEach var="item" items="${tagList}" varStatus="status">
 						<option value="${item.org}">${item.org}</option>
 					</c:forEach>
  --%>
 			</select><br>
-			<input type="text" name="ou3" id="ou" placeholder="이름을 입력헤주세요"><br>
-			<button type="button" id="fnSaveOrg" >add</button>
+			<input type="text" name="sn" id="sn" value="lee" placeholder="성을 입력헤주세요"><br>
+			<input type="text" name="cn" id="cn" value="eee" placeholder="이름을 입력헤주세요"><br>
+
+			<button type="button" id="btnSaveUser" >add</button>
 
 		</div>
 	</form>

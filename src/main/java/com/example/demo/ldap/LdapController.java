@@ -46,6 +46,28 @@ public class LdapController {
 
 	    return "redirect:/ldap";
 	}
+		@RequestMapping(value="/searchPeople")
+		public String searchGroup(User vo, Model model) throws NamingException{
+	
+			System.out.println("-----search to org user-----");    
+			System.out.println("search user : " + vo.toString());
+		
+		    LDAPConnection con = new LDAPConnection();
+		    
+		    System.out.println("search user 하위에 존재하는 계정 정보 서칭");
+		    con.connection();
+		    String ret =""; 
+		    ret = con.searchGroups(vo);
+			System.out.println("ret : "+ret);    
+
+		//    model.addAttribute("");
+		    
+			System.out.println("-----end-----");    
+
+	    return "redirect:/ldap";
+	}
+		
+		
 		
 		@RequestMapping(value="/login")
 		public String authLogin(User vo) throws NamingException{
@@ -85,6 +107,7 @@ public class LdapController {
 		
 		    LDAPConnection con = new LDAPConnection();
 		    con.connection();
+		    con.addUser(vo);
 		   
 			System.out.println("-----end-----");    
 
