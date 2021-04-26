@@ -9,6 +9,12 @@ SELECT *
 FROM tb_users 
 </select>
 
+<select id="getOuList" resultType="com.example.demo.ldap.User">
+SELECT seq, ou
+FROM tb_users 
+</select>
+
+
 <select id="getInOuUserList" parameterType="com.example.demo.ldap.User" resultType="com.example.demo.ldap.User">
 SELECT * 
 FROM tb_users
@@ -31,6 +37,19 @@ INSERT
 			#{ou}
 		)
 </insert>
+
+<!-- 회사 정보 저장하기 -->
+<insert id="saveOu" parameterType="java.util.List" >
+INSERT
+INTO 
+	tb_users 
+		(seq, ou) 
+	<foreach collection="list" item="item" separator=",">
+			VALUES ( (SELECT COALESCE(max(seq),0)+1 FROM tb_users), #{item.ou})
+	</foreach>							
+</insert>
+
+
 
 <delete id="deleteUser" parameterType="com.example.demo.ldap.User">
 

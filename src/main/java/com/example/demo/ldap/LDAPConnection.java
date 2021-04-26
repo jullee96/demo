@@ -1,7 +1,10 @@
 package com.example.demo.ldap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.naming.AuthenticationException;
@@ -35,6 +38,7 @@ public class LDAPConnection {
         try {
                 dc = new InitialDirContext(env);
                 System.out.println("connection success to ldap server...");
+                  
         } catch (AuthenticationException ex) {
 			System.out.println("connection fail to ldap server..."+ex.getMessage());
 		} catch (NamingException e) {
@@ -66,7 +70,7 @@ public class LDAPConnection {
 
     ////* search method *////
 
-	public void searchAll() throws NamingException {
+	public ArrayList searchAll() throws NamingException {
 		String searchFilter = "(objectClass=*)";
 		SearchControls searchScope = new SearchControls();
 		searchScope.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -74,20 +78,37 @@ public class LDAPConnection {
 		NamingEnumeration baseDn = dc.search("dc=example,dc=com", searchFilter, searchScope);
 
 		SearchResult result = null;
+		String chkOu = "";
+
+		ArrayList <HashMap<String,String>> list = new ArrayList<HashMap<String,String>>();
 
 		while (baseDn.hasMore()) {
 			result = (SearchResult) baseDn.next();
 			Attributes attr = result.getAttributes();
+			
+			System.out.println("dn : " + result.getNameInNamespace());
 
-			System.out.println("attr : " +attr);
+			HashMap<String, String> map = new HashMap<String, String>();
+			map.put("dn", result.getNameInNamespace());
+			
+			if(attr.get("cn") != null ) {
+				String tmpCn[] = attr.get("cn").toString().split(": ");
+				map.put("cn", tmpCn[1]);
+				
+				list.add(map);
+			}
+			
+			
+			if(attr.get("ou") != null ) {
+				String tmpOu[] = attr.get("ou").toString().split(": ");
+				map.put("ou", tmpOu[1]);
 
-//			System.out.println(attr.get("cn"));
-//			System.out.println(attr.get("sn"));
-//			System.out.println(attr.get("dn"));
-
-			System.out.println("");
-
+				list.add(map);
+			}
+	
 		}
+
+		return list;
 
 	}
 
@@ -117,7 +138,8 @@ public class LDAPConnection {
 			System.out.println(attr.get("uid"));
 	
 		}
-
+		System.out.println("chkOu : "+ chkOu);
+			
 //		String[] tmpOuSplit = chkOu.split(":");
 //		
 //		for (int i = 0; i < tmpOuSplit.length; i++) {

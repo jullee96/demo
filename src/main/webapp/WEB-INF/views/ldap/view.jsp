@@ -41,7 +41,7 @@
 
 			<br><br>
 			<p>유저 추가</p>
-			<select name="">
+			<select name="ou">
 					<option value="">--회사를 선택하세요--</option>
 					<option value="ivs">ivs</option>
 					<option value="testGroup">testGroup</option>
